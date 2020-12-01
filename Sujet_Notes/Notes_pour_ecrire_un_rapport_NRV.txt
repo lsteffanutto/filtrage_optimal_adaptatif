@@ -1,0 +1,56 @@
+=> retrouver poly J.Daniell
+
+*** DOC: *********************************************************
+- cours signal nancy ~p.22
+http://people.irisa.fr/Nancy.Bertin/wp-content/uploads/2014/09/cours8.pdf
+
+- https://fr.wikipedia.org/wiki/Processus_autor%C3%A9gressif
+
+- http://www.i3s.unice.fr/~deneire/stocha.pdf ~p.39
+
+- http://avram.perso.univ-pau.fr/sertemp/ser.pdf p.23
+
+- http://perso.univ-lemans.fr/~jhthomas/fiches/f10.pdf =v
+(Proposez un mod`ele autor´egressif `a 10 coefficients du signal de bruit de structure `a
+partir des fonctions levinson.m, randn.m et filter.m.
+Calculez ´egalement les p´eriodogrammmes de Welch Sˆ
+b(f) du bruit destructure et Sˆˆb(f) du signal synth´etis´e `a l’aide de la fonction pwelch.m. L’utilisationest la suivante : [S, f ˆ ] = pwelch(x, hanning(K), K/2, K, fe);)
+
+******************************************************************
+
+*** Question 1: *************************************************
+
+Modèle auto-régressif = 
+
+- processus à mémoire courte => au delà d'un certain ordre pas de corrélation
+
+- (voir formule cours) est modèle de prédiction basé sur les p derniers échantillons du signal (partie de gauche avec la somme), et une erreur de prediciton, qui correspond à un bruit blanc (partie droite u(k)). dépend pas des réalisation le burit blanc
+
+- On choisit les paramètres AR afin de réduire l'erreur de prédiciton.
+
+- faire le schéma avec le signal qui rentre le filtre et tout
+
+- Un processus autorégressif est semblable à la fonction de transfert d'un filtre à réponse impulsionnelle infinie, en ce sens où la sortie dépend de ses états précédents
+
+- la transformée en Z et la réponse impulsionnel qui dépend des sorties précédents, donc RII
+et filtre causal (causal = RI nulel pour n<0)
+
+- Modèle avec seulement des pôles donc résonnances, car y'a que des pôles sur la fonction de transfert.
+( plus le pôle est proche du cercle unité plus la résonnance est forte, voir TP Kack Daniell S7)
+
+- faire schéma d'un signal AR avec des PICS (voir cahier page à droite de "Modèle auto-régressif")
+
+"  exprimez la densité spectrale de puissance en fonction
+des paramètres du modèle "
+
+- Wiener Kintchine (faire schéma), DSP dépend de la TF de l'autocorrélation
+- DSP voir (voir cahier page à droite de "Modèle auto-régressif")
+- DSP Wikipedia "La Densité spectrale de puissance est la Transformée de Fourier de la fonction d'autocovariance" wtf
+
+- DSP c'est un truc théorique car ça dépend de l'espérance donc d'une infinité de réalsiation. Nous on peut faire le périodogramme mais c'est réalisation dépendant et ce sera dégueu et pas aussi lisse que la DSP. D'où l'utilité d'un périodogramme qui va faire des moyennes des powerspectre pour se rapprocher de la DSP et l'estimer
+
+- autocorr biaisé et non biaisé voir notes Projet S9
+
+powerspectre = projet S9
+
+*******************************************************************
