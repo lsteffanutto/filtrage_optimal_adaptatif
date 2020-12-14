@@ -13,7 +13,7 @@ ordre_p=6;
 %% PART1: Processus Auto-Regressif
 p=[0.95*exp(i*pi/5),0.9*exp(i*3*pi/4),0.95*exp(i*pi/2),0.95*exp(-i*pi/5),0.9*exp(-i*3*pi/4),0.95*exp(-i*pi/2)];
 
-A = poly(p);
+A = poly(p)
 B = [1];
 
 bb=sqrt(sigma2)*randn(1,N); %Bruit pour generer les bails
@@ -26,9 +26,7 @@ DSP = Y.*conj(Y);
 
 %% PART2: Yule-Walker et Filtrage Adaptatif
 
-%%% 1.YULE-WALKER (voir cahier) %%%
-
-%Estimation des paramètres AR
+%%% 1.Yule-Walker (voir cahier) %%%
 
 %vecteur de corrélation
 R_xx_tot=xcorr(x_k);
@@ -41,20 +39,8 @@ r_xx_p=R_xx_tot(N+1:N+ordre_p)';
 c = R_xx_tot(N:N+ordre_p-1);    % 1ère colonne
 r = R_xx_tot(N:-1:N-ordre_p+1); % 1ère ligne
 R_X=toeplitz(c,r);              % Matrice finale
-
-AR_estime=(-(R_X^-1)*r_xx_p)'  % Paramètres AR ESTIMES
-
-AR_reel=A(2:6)                % Paramètres AR REELS
-
-%DSP avec paramètres AR estimés
-Y_reel = freqz(B,[1 AR_estime],2*pi*f); %RI du filtre
-DSP_reelle = Y_reel.*conj(Y_reel);
-
-figure,plot(f,DSP,'LineWidth',2)
-hold on; plot(f,DSP_reelle,'LineWidth',1);
-title("Distance spectrale")
-legend("Paramètres AR réels","Paramètres AR estimés")
-
+AR_estime=(-(R_X^-1)*r_xx_p)'  % Paramètres AR estimés
+AR
 %Filtrage Adaptatif
 
 
