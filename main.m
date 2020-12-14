@@ -1,9 +1,11 @@
 clear
 close all
 
+%% A RENDRE LE 22 JANVIER %%
+
 %% VAR
 
-disp1=0;
+disp1=1;
 
 N = 5000;%pow2(10);
 f=-1/2:1/N:1/2-1/N;
@@ -55,7 +57,7 @@ hold on; plot(f,DSP_reelle,'LineWidth',1);
 title("Distance spectrale")
 legend("Paramètres AR réels","Paramètres AR estimés")
 
-%Filtrage Adaptatif
+%Filtrage Adaptatif (regarder les pdf de Grivel)
 
 
 
@@ -68,12 +70,15 @@ legend("Paramètres AR réels","Paramètres AR estimés")
 
 %% PLOTS
 if disp1==1
+    figure,
 %signal powerspectre dsp
 subplot 311
 plot(x_k)
 title('x')
 subplot 312
-plot(f,powerspectre)
+% plot(f,20*log10(powerspectre/pi))
+plot(f,powerspectre/N*100)
+
 title('Spectre de puissance')
 subplot 313
 plot(f,DSP)
