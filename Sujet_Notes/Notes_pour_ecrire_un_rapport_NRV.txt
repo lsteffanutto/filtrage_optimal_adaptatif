@@ -1,6 +1,14 @@
 => retrouver poly J.Daniell
 
 *** DOC: *********************************************************
+example1
+https://fr.mathworks.com/matlabcentral/fileexchange/3649-lms-algorithm-demo
+example2
+https://fr.mathworks.com/matlabcentral/fileexchange/35670-lms-algorithm-implementation
+- algo adaptatif
+https://perso.esiee.fr/~bercherj/New/polys/FILT_ADA_jfb.pdf
+- processus AR debut et filtre adaptatif p.82
+https://www.researchgate.net/profile/Pascal_Scalart/publication/318795823_Cours_Modelisation_Parametrique_Filtrage_Optimal_et_Filtrage_Adaptatif/links/597f8f38458515687b4bb9e6/Cours-Modelisation-Parametrique-Filtrage-Optimal-et-Filtrage-Adaptatif.pdf
 - cours signal nancy ~p.22
 http://people.irisa.fr/Nancy.Bertin/wp-content/uploads/2014/09/cours8.pdf
 
@@ -24,12 +32,12 @@ Modèle auto-régressif =
 
 - processus à mémoire courte => au delà d'un certain ordre pas de corrélation
 
-- (voir formule cours) est modèle de prédiction basé sur les p derniers échantillons du signal (partie de gauche avec la somme), et une erreur de prediciton, qui correspond à un bruit blanc (partie droite u(k)). dépend pas des réalisation le burit blanc
+- (voir formule cours) est modèle de prédiction basé sur les p derniers échantillons du signal (partie de gauche avec la somme), et une erreur de prediciton, qui correspond à un bruit blanc (partie droite u(k)). le burit blanc ne dépend pas des réalisation 
 
 - On choisit les paramètres AR afin de réduire l'erreur de prédiciton.
 
 - faire le schéma avec le signal qui rentre le filtre et tout
-
++3
 - Un processus autorégressif est semblable à la fonction de transfert d'un filtre à réponse impulsionnelle infinie, en ce sens où la sortie dépend de ses états précédents
 
 - la transformée en Z et la réponse impulsionnel qui dépend des sorties précédents, donc RII
