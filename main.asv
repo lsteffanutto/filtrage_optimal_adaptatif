@@ -10,7 +10,7 @@ disp_part_estimation_parametre_AR=0;
 disp_part_LMS=1;
 disp_part_Kalman=0;
 
-N = 50000;%pow2(10);
+N = 5000;%pow2(10);
 f=-1/2:1/N:1/2-1/N;
 sigma2=10;
 ordre_p=6;
@@ -92,13 +92,13 @@ H_coeff=zeros(ordre_p,1);
 % [alpha] = alpha_optimal_LMS(x_k);
 
 % Vaut mieux prendre un alpha + petit pour que ça converge bien
-alpha=0.0001; 
+alpha=0.00015; 
 
 % Monte Carlo
 NMC=1;
 
 % Iterations LMS
-boucle_filtre=N;
+boucle_filtre=2000;
 H_coeff_tot=zeros(ordre_p,boucle_filtre); %stocker les valeurs des paramètres AR et moyenner les réalisations
 % H_coeff_real=zeros(ordre_p,boucle_filtre);
 x=1:boucle_filtre;
@@ -107,9 +107,9 @@ x=1:boucle_filtre;
 for i=1:NMC
     
 % iterations LMS: X_n=input=bb, d(k)=x_k=signal désiré (on prend les 6 derniers échantillons de chaque)
-for k = ordre_p+1:boucle_filtre
+for k = ordre_p:boucle_filtre
     
-    [H_coeff] = f_LMS(H_coeff,alpha,x_k(k-1:-1:k-ordre_p),x_k(k)); %MAJ coeff filtre
+    [H_coeff] = f_LMS(H_coeff,alpha,x_k(k:-1:k-ordre_p+1),x_k(k)); %MAJ coeff filtre
 
 %     H_coeff_real(:,k)=H_coeff; % juste une réalisation pour voir
     
@@ -120,8 +120,8 @@ end
 end
 
 % On moyenne les réalisations
-H_coeff_tot=-H_coeff_tot/NMC; 
--H_coeff % => mettre un moins car formule processus auto-regressif
+H_coeff_tot=H_coeff_tot/NMC; 
+H_coeff
 
 end % FIN LMS
 
