@@ -1,16 +1,17 @@
 clear all
 close all
 clc;
+beep off;
 %% A RENDRE LE 22 JANVIER %%
 
 %% VAR
 
 disp_part_1=0;
 disp_part_estimation_parametre_AR=0;
-disp_part_LMS=1;
-disp_part_Kalman=0;
+disp_part_LMS=0;
+disp_part_Kalman=1;
 
-N = 50000;%pow2(10);
+N = 5000;%pow2(10);
 f=-1/2:1/N:1/2-1/N;
 sigma2=10;
 ordre_p=6;
@@ -41,7 +42,7 @@ powerspectre=fftshift((abs(fft(x_k)))).^2/N;
 
 %RI et DSP du filtre
 Y = freqz(B,A,2*pi*f); 
-DSP = Y.*conj(Y);
+DSP = Y.*conj(Y); %periodogramme
 
 %% PART 2
 %% 1. Estimation des paramètres AR - YULE-WALKER (voir cahier) %%%
@@ -92,16 +93,20 @@ H_coeff=zeros(ordre_p,1);
 % [alpha] = alpha_optimal_LMS(x_k);
 
 % Vaut mieux prendre un alpha + petit pour que ça converge bien
-alpha=0.0001; 
+alpha=0.00025; 
+
+% Graphique rapport
+% 1. NMC=1; alpha=0.00025
+% 2. NMC=10; alpha=0.00015; N=5000
 
 % Monte Carlo
 NMC=1;
 
 % Iterations LMS
 boucle_filtre=N;
-H_coeff_tot=zeros(ordre_p,boucle_filtre); %stocker les valeurs des paramètres AR et moyenner les réalisations
-% H_coeff_real=zeros(ordre_p,boucle_filtre);
-x=1:boucle_filtre;
+
+%stocker les valeurs des paramètres AR et moyenner les réalisations
+H_coeff_tot=zeros(ordre_p,boucle_filtre); 
 
 % Filtre LMS + MC (pour moyenner réalisations)
 for i=1:NMC
@@ -109,7 +114,7 @@ for i=1:NMC
 % iterations LMS: X_n=input=bb, d(k)=x_k=signal désiré (on prend les 6 derniers échantillons de chaque)
 for k = ordre_p+1:boucle_filtre
     
-    [H_coeff] = f_LMS(H_coeff,alpha,x_k(k-1:-1:k-ordre_p),x_k(k)); %MAJ coeff filtre
+    [H_coeff] = f_LMS(H_coeff,alpha,-x_k(k-1:-1:k-ordre_p),x_k(k)); %MAJ coeff filtre
 
 %     H_coeff_real(:,k)=H_coeff; % juste une réalisation pour voir
     
@@ -120,40 +125,65 @@ end
 end
 
 % On moyenne les réalisations
-H_coeff_tot=-H_coeff_tot/NMC; 
--H_coeff % => mettre un moins car formule processus auto-regressif
+H_coeff_tot=H_coeff_tot/NMC; 
+
+% AR estimés LMS
+AR_LMS=H_coeff 
 
 end % FIN LMS
+
+
 
 %% 3.Filtrage de Kalman (p.19 cours PDF3)
 if disp_part_Kalman==1
 
-    % Init paramètres de Kalman
-alpha = 1e2; 
-[Phi] = compagnon_matrix(AR_reel);
-P = alpha*eye(ordre_p);
+% Si surestimation de l'ordre
+surestimation_AR=2
+ordre_p=ordre_p+surestimation_AR;
+
+
+% Init paramètres de Kalman
+
+% Au début beaucoup d'erreur car paramètres inits au hasard
+alpha = 1e4; 
+
+% Matrice covariance de l'erreur
+P = alpha*eye(ordre_p);       
+
+% Phi
+Phi=eye(ordre_p);
+
+% H contient les [x(k)...x(k-6)] échantillons
 H = [1 zeros(1,ordre_p-1)];
-Q=eye(ordre_p);
-sigma2_e = 10;
+% Q=eye(ordre_p);
 
-y=randn(1,N);
+% Bruit de modèle
+Q=0;
 
+% Bruit de mesure
+sigma2 = 10;
+
+% Iterations Kalman
 boucle_filtre=N;
-H_coeff_tot=zeros(ordre_p,boucle_filtre);
 
-for k = ordre_p:boucle_filtre
-    [x,P] = Kalman(x(k:-1:k-ordre_p+1),P,x_k(k),Q,sigma2_e,Phi,H);
+% On init le vecteur d'état
+x=zeros(ordre_p,1);
+
+%stocker les valeurs des paramètres AR à chaque itération
+H_coeff_tot_Kalman=zeros(ordre_p,boucle_filtre);
+
+for k = ordre_p+1:boucle_filtre
+    [x,P] = Kalman_processus_AR(x,P,x_k(k),Q,sigma2,Phi,-x_k(k-1:-1:k-ordre_p));
+    H_coeff_tot_Kalman(:,k)= x;
 end
 
-% x init
-% x=zeros(
-    
+AR_Kalman=x
     
 end
 
 
 %% PLOTS
-
+x=1:boucle_filtre;
 if disp_part_1==1           %% PART 1 %%
 figure,
 %signal powerspectre dsp
@@ -201,13 +231,35 @@ end
 xlabel('itération');
 ylabel('évolution estimation');
 % ylim([-0.6 1]);
-title('évolution estimation coeff AR filtre LMS');
-legend('AR 1','AR 2','AR 3','AR 4','AR 5','AR 6');
-
+title("estimation des coeff AR par filtre LMS à chaque itération, alpha="+alpha);
 hold on;scatter(x,H_coeff_tot(1,:),'b.');
 hold on;scatter(x,H_coeff_tot(2,:),'r.');
 hold on;scatter(x,H_coeff_tot(3,:),'y.');
 hold on;scatter(x,H_coeff_tot(4,:),'m.');
 hold on;scatter(x,H_coeff_tot(5,:),'g.');
 hold on;scatter(x,H_coeff_tot(6,:),'c.');
+legend('AR 1 réel','AR 2 réel','AR 3 réel','AR 4 réel','AR 5 réel','AR 6 réel','AR 1 estimé','AR 2 estimé','AR 3 estimé','AR 4 estimé','AR 5 estimé','AR 6 estimé');
+
+end
+
+if disp_part_Kalman==1         %% Kalman %%
+    
+figure,
+for i =1:ordre_p-surestimation_AR
+    hold on;plot([0 boucle_filtre],[AR_reel(i) AR_reel(i)],'LineWidth',2);
+end
+xlabel('itération');
+ylabel('évolution estimation');
+% ylim([-0.6 1]);
+title("estimation des coeff AR par filtre Kalman à chaque itération");
+hold on;scatter(x,H_coeff_tot_Kalman(1,:),'b.');
+hold on;scatter(x,H_coeff_tot_Kalman(2,:),'r.');
+hold on;scatter(x,H_coeff_tot_Kalman(3,:),'y.');
+hold on;scatter(x,H_coeff_tot_Kalman(4,:),'m.');
+hold on;scatter(x,H_coeff_tot_Kalman(5,:),'g.');
+hold on;scatter(x,H_coeff_tot_Kalman(6,:),'c.');
+hold on;scatter(x,H_coeff_tot_Kalman(7,:),'r+');
+hold on;scatter(x,H_coeff_tot_Kalman(7,:),'k.');
+legend('AR 1 réel','AR 2 réel','AR 3 réel','AR 4 réel','AR 5 réel','AR 6 réel','AR 1 estimé','AR 2 estimé','AR 3 estimé','AR 4 estimé','AR 5 estimé','AR 6 estimé','AR 7 en trop','AR 8 en trop');
+
 end
