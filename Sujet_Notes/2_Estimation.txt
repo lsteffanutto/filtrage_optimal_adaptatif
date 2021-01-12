@@ -1,0 +1,58 @@
+******************** Estimation Yule-Walker *****************************
+
+équation de Yule-Walker: r_x = - R_x theta
+
+r_x = vecteur d'auto-corrélation d'ordre p
+R_x = matrice d'auto-covariance toeplitz)
+theta= les paramètres AR à estimer
+
+equation matricielle cahier
+
+theta = - R_x^-1 r_x
+
+Quand le nombre d'échantillons tend vers +in on approche mieux les paramètres réels, quand le nombre d'échantillons diminue l'estimation devient moins bonne
+
+******************** Estimation Filtre Adaptatif LMS *****************************
+
+Converge vers le filtre optimal de Wiener, complexité calculatoire faible
+
+Equations (2.41) et (2.43) PDF2 cours
+
+alpha grand = converge plus vite vers solution mais oscille beaucoup plus autour des bons paramètres
+
+Condition sur alpha (2.59) (2.61) PDF2 cours
+=> ! En pratique on doit prendre un alpha beaucoup plus petit !
+
+On init les parametres a estimer à 0 puis on les estime à chaque iteration du filtre
+
+***Schéma du filtre avec correspondance réponse désirée et tout Matlab+Notes cahier
+***Plot LMS normal
+***Plot LMS sur 10 réalisation
+
+=> surestimation de l'ordre estime les parametres en + à 0
+
+******************** Estimation Filtrage Kalman *****************************
+
+Kalman: 
+
+
+1 phase de prédiction, 2 équation 
+1 phase de correction, 3 équations
+
+écrire les 5 équations du cahier
+
+erreur p.36 = trace(P)
+organigramme p.36
+
+Représentation dans l'espace d'ETAT
+
+init:
+
+- ici on cherche les paramètres AR, ils correspondent donc au vecteur d'etat, qu'on init à 0
+- alpha = 1000 = fenêtre d'observation importante au début car on est loin de la solution
+- P = alpha*Id_6
+- Phi = Id_6
+- Q = Bruit de modèle = 0 car les paramètres AR à estimer ne bouge pas
+- Bruit de mesure = sigma2 = 10 = bruit processus generateur
+
+Technique d'estimation bcp plus efficace que LMS
